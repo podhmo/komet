@@ -15,6 +15,7 @@ except IOError:
 
 install_requires=[
     'setuptools',
+    'pyramid'
     ]
 
 docs_extras = [
