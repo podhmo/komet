@@ -15,7 +15,9 @@ except IOError:
 
 install_requires=[
     'setuptools',
-    'pyramid'
+    'pyramid',
+    'sqlalchemy',
+    'sqlash'
     ]
 
 docs_extras = [

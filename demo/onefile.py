@@ -9,6 +9,7 @@ import sqlalchemy.orm as orm
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import scoped_session, sessionmaker
+from datetime import datetime
 
 Session = scoped_session(sessionmaker())
 engine = sa.create_engine('sqlite:///onefile.db', echo=True)
@@ -25,10 +26,19 @@ class User(Base):
     name = sa.Column(sa.String(255), default="", nullable=False)
     description = sa.Column(sa.String(255), default="", nullable=False)
     age = sa.Column(sa.Integer)
+    created_at = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
 
 
 def top_view(request):
     return {}
+
+
+def simple_commit_tween(handler, registry):  # todo:fix
+    def tween(request):
+        response = handler(request)
+        request.context.session.commit()
+        return response
+    return tween
 
 
 if __name__ == '__main__':
@@ -36,14 +46,21 @@ if __name__ == '__main__':
     settings = {"mako.directories": here,
                 "pyramid.reload_all": True}
 
+    Base.metadata.drop_all()
     Base.metadata.create_all()
+
+    Session.add(User(name="foo", age=20))
+    Session.commit()
 
     config = Configurator(settings=settings)
     config.include("pyramid_mako")
 
+    config.add_tween("onefile.simple_commit_tween")
+
     ## komet::
     config.include("komet")
     config.add_komet_dbsession(Session)
+    config.add_komet_model_renderer(Base)
     config.add_komet_apiset(User, "user")
 
 

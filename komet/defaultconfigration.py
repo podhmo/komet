@@ -5,6 +5,7 @@ from .builder import (
     APISetBuilder,
     APISetCustomizer
 )
+from .renderers import ModelRendererFactory
 
 
 @provider(i.IIndexFromRequest)
@@ -68,11 +69,19 @@ def add_dbsession(config, session):
     config.registry.registerUtility(session, i.IDBSession)
 
 
+def add_model_renderer(config, Base):
+    from pyramid.renderers import JSON
+    renderer = JSON()
+    factory = ModelRendererFactory(renderer)
+    config.add_renderer("json", factory(Base))
+
+
 def includeme(config):
     config.include(define_default_apiset_builder)
     config.add_directive("add_komet_apiset", add_apiset)
     config.add_directive("add_komet_dbsession", add_dbsession)
     config.add_directive("add_komet_custom_executor", add_custom_executor)
+    config.add_directive("add_komet_model_renderer", add_model_renderer)
 
     config.registry.registerUtility(index_from_request_default, i.IIndexFromRequest)
     config.registry.registerUtility(config.maybe_dotted(".repository.DefaultSQLARepository"), i.IRepository)
