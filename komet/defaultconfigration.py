@@ -35,23 +35,30 @@ def define_default_apiset_builder(config):
     builder.define(
         route="%(model)s.unit",
         scene=i.IShow,
-        path="%(model)ss/{id}",
+        path="%(model)ss/{id}/",
         view=".views.show",
         request_method="GET",
         renderer="json")
     builder.define(
         route="%(model)s.unit",
         scene=i.IEdit,
-        path="%(model)ss/{id}",
+        path="%(model)ss/{id}/",
         view=".views.edit",
         request_method="PUT",
         renderer="json")
     builder.define(
         route="%(model)s.unit",
         scene=i.IDelete,
-        path="%(model)ss/{id}",
+        path="%(model)ss/{id}/",
         view=".views.delete",
         request_method="DELETE",
+        renderer="json")
+    builder.define(
+        route="%(model)s.schema",
+        scene=None,
+        path="%(model)ss/schema",
+        view=".views.schema",
+        request_method="GET",
         renderer="json")
 
 
@@ -88,3 +95,9 @@ def includeme(config):
     config.registry.adapters.register([i.ICreate], i.IExecutor, "", config.maybe_dotted(".executors.CreateExecutor"))
     config.registry.adapters.register([i.IEdit], i.IExecutor, "", config.maybe_dotted(".executors.EditExecutor"))
     config.registry.adapters.register([i.IDelete], i.IExecutor, "", config.maybe_dotted(".executors.DeleteExecutor"))
+
+    # jsonschema
+    from alchemyjsonschema import SingleModelWalker, SchemaFactory
+    factory = SchemaFactory(SingleModelWalker)
+    config.registry.registerUtility(factory, i.ISchemaFactory)
+

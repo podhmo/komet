@@ -31,6 +31,10 @@ class KometResource(object):
     def repository(self):
         return self.utility(i.IRepository)(self.request, self.modelclass, self.session)
 
+    @reify
+    def schema(self):
+        return self.utility(i.ISchemaFactory)(self.modelclass)
+
     def get_index(self):
         return self.utility(i.IIndexFromRequest)(self.request)
 

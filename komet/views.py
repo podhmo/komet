@@ -22,6 +22,11 @@ def listing(context, request):
     obs = list(repository)
     return obs
 
+
+def schema(context, request):
+    return context.schema
+
+
 def show(context, request):
     repository = context.repository
     ob = repository[context.get_index()]

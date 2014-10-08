@@ -42,6 +42,11 @@ class IRepository(Interface):
         pass
 
 
+class ISchemaFactory(Interface):
+    def __call__(modelclass):
+        pass
+
+
 class IExecutor(Interface):
     def validation(ob=None):
         pass
