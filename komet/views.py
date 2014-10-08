@@ -18,18 +18,18 @@ def create(context, request):
 
 
 def listing(context, request):
-    repository = context.get_repository()
-    return list(repository)
-
+    repository = context.repository
+    obs = list(repository)
+    return obs
 
 def show(context, request):
-    repository = context.get_repository()
+    repository = context.repository
     ob = repository[context.get_index()]
     return ob
 
 
 def edit(context, request):
-    repository = context.get_repository()
+    repository = context.repository
     ob = repository[context.get_index()]
     executor = context.get_executor(IEdit)
     try:
@@ -41,7 +41,7 @@ def edit(context, request):
 
 
 def delete(context, request):
-    repository = context.get_repository()
+    repository = context.repository
     ob = repository[context.get_index()]
     executor = context.get_executor(IDelete)
     try:

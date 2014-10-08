@@ -6,7 +6,7 @@ from .resources import resource_factory
 # how to use
 def includeme(config):
     from . import interfaces as i
-    builder = APISetBuilder(config, cutomizer=APISetCustomizer())
+    builder = APISetBuilder(config, customizer=APISetCustomizer())
 
     # define api views
     builder.define(

@@ -20,12 +20,12 @@ class DefaultSQLARepository(object):
     def _get_maybe_int(self, k, default):
         try:
             return int(self.request.GET.get(k, default))
-        except ValueError:
+        except (ValueError, TypeError):
             return default
 
     @reify
     def query(self):  # xxx:
-        q = self.session(self.model)
+        q = self.session.query(self.model)
         sort_key = self.request.GET.get("sort")
         if sort_key:
             direction = self.request.GET.get("direction", "asc")
@@ -42,4 +42,5 @@ class DefaultSQLARepository(object):
         return q
 
     def __iter__(self):
-        return self.query.all()
+        for x in self.query.all():
+            yield x

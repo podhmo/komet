@@ -10,12 +10,19 @@ class IDBSession(Interface):
         pass
 
 
+class IAPISetBuilder(Interface):
+    def define(route, scene, path, view, **kwargs):
+        pass
+
+    def build(model, name=None, **kwargs):
+        pass
+
+
 class IModelResource(Interface):
     request = Attribute("")
     modelclass = Attribute("")
-
-    def repository():
-        pass
+    repository = Attribute("")
+    session = Attribute("")
 
     def get_executor(scene):
         pass
@@ -44,7 +51,7 @@ class IExecutor(Interface):
 
 
 class IValidationError(Interface):
-    initials = Attribute()
+    initials = Attribute("")
 
     def as_dict():
         pass
@@ -56,6 +63,10 @@ class IIndexFromRequest(Interface):
 
 
 class IScene(Interface):
+    pass
+
+
+class IListing(IScene):
     pass
 
 

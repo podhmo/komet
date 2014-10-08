@@ -24,6 +24,10 @@ class KometResource(object):
         return self.modelclass.__name__
 
     @reify
+    def session(self):
+        return self.utility(i.IDBSession)
+
+    @reify
     def repository(self):
         return self.utility(i.IRepository)(self.request, self.modelclass, self.session)
 
