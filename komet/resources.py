@@ -49,7 +49,8 @@ class KometResource(object):
         return fn
 
     def get_executor(self, scene):
-        return self.customized_or_default([scene], i.IExecutor)
+        fn = self.customized_or_default([scene], i.IExecutor)
+        return fn(self, self.request.json_body)
 
     def httpexception(self, err):
         return HTTPBadRequest(err)  # xxx

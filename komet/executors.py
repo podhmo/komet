@@ -38,7 +38,7 @@ class CreateExecutor(Executor):
     def execute(self, ob=None):
         if self.params is None:
             raise RuntimeError("execute after validation")
-        ob = self.context.Model(**self.params)
+        ob = self.context.modelclass(**self.params)
         self.context.session.add(ob)
         return ob
 

@@ -1,8 +1,19 @@
 # -*- coding:utf-8 -*-
+from functools import wraps
 from sqlash import SerializerFactory
 import sqlalchemy.types as t
 
 
+def maybe_none(fn):
+    @wraps(fn)
+    def wrapper(v, r):
+        if v is None:
+            return None
+        return fn(v, r)
+    return wrapper
+
+
+@maybe_none
 def datetime_for_human(dt, r):
     return dt.strftime("%Y/%m/%dT%H:%M:%S.%f%z")
 
