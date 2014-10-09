@@ -54,3 +54,4 @@ docs/_build/
 
 # misc
 *.db
+bower_components

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 import os.path
@@ -23,7 +26,7 @@ class User(Base):
     query = Session.query_property()
 
     id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(sa.String(255), default="", nullable=False)
+    name = sa.Column(sa.String(255), default="", nullable=False, unique=True)
     description = sa.Column(sa.String(255), default="", nullable=False)
     age = sa.Column(sa.Integer)
     created_at = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
@@ -34,9 +37,18 @@ def top_view(request):
 
 
 def simple_commit_tween(handler, registry):  # todo:fix
+    from pyramid.httpexceptions import HTTPBadRequest
+
     def tween(request):
-        response = handler(request)
-        request.context.session.commit()
+        try:
+            response = handler(request)
+            if hasattr(request.context, "session"):
+                request.context.session.commit()
+        except Exception as e:
+            logger.exception(e)
+            if hasattr(request.context, "session"):
+                request.context.session.rollback()
+            return HTTPBadRequest(e)
         return response
     return tween
 
@@ -64,9 +76,12 @@ if __name__ == '__main__':
     config.add_komet_apiset(User, "user")
 
 
+    ## ui::
     config.add_mako_renderer(".html")
     config.add_route('top', '/')
     config.add_view(top_view, route_name='top', renderer="onefile.html")
+    config.add_static_view("static", path="%(here)s/static" % {"here": here})
+    config.add_static_view("bower", path="%(here)s/bower_components" % {"here": here})
 
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 7654, app)
