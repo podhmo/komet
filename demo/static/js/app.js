@@ -2,7 +2,7 @@ var apps = apps || {};
 
 (function(apps){
   function Model(){
-    this.params =  {"name": "", "age": 0, "description": ""};
+    this.params =  {"name": "", "age": 0, "description": "", "id": 1};
     this.modifiedHook = [];
   }
 
@@ -53,11 +53,14 @@ var apps = apps || {};
     this.model = model;
 
     var self = this; //hmm
+    this.$el.find("input[name='id']").on("input", function(e){
+      self.model.change("id", Number.parseInt($(e.currentTarget).val()));
+    });
     this.$el.find("input[name='name']").on("input", function(e){
       self.model.change("name", $(e.currentTarget).val());
     });
     this.$el.find("input[name='age']").on("input", function(e){
-      self.model.change("age", $(e.currentTarget).val());
+      self.model.change("age", Number.parseInt($(e.currentTarget).val()));
     });
     this.$el.find("textarea[name='description']").on("input", function(e){
       self.model.change("description", $(e.currentTarget).val());
@@ -74,7 +77,10 @@ var apps = apps || {};
   UIView.prototype.afterAPI = function afterAPI(d){
     d.done(function(data){
       this.$el.find("pre.output").text(JSON.stringify(data, null, 2));
-    }.bind(this));
+    }.bind(this))
+     .fail(function(data){
+       this.$el.find("pre.output").text(data.responseText);
+     }.bind(this));
   };
 
 
@@ -89,6 +95,24 @@ var apps = apps || {};
 
   var CreateAPIView = new APIViewFactory(function(){
     var d = this.gateway.POST(this.gateway.baseurl+"/", this.model.params);
+    return this.subview.afterAPI(d);
+  });
+
+  var EditAPIView = new APIViewFactory(function(){
+    var url = this.gateway.baseurl+"/"+this.model.params.id+"/";
+    var d = this.gateway.PUT(url, this.model.params);
+    return this.subview.afterAPI(d);
+  });
+
+  var ShowAPIView = new APIViewFactory(function(){
+    var url = this.gateway.baseurl+"/"+this.model.params.id+"/";
+    var d = this.gateway.GET(url, null);
+    return this.subview.afterAPI(d);
+  });
+
+  var DeleteAPIView = new APIViewFactory(function(){
+    var url = this.gateway.baseurl+"/"+this.model.params.id+"/";
+    var d = this.gateway.DELETE(url, null);
     return this.subview.afterAPI(d);
   });
 
@@ -110,6 +134,12 @@ var apps = apps || {};
 
     this.createAPI = new CreateAPIView(this.gateway, this.uiview, this.model);
     this.uiview.$el.find("button.create").on("click", this.createAPI.api.bind(this.createAPI));
+    this.editAPI = new EditAPIView(this.gateway, this.uiview, this.model);
+    this.uiview.$el.find("button.edit").on("click", this.editAPI.api.bind(this.editAPI));
+    this.showAPI = new ShowAPIView(this.gateway, this.uiview, this.model);
+    this.uiview.$el.find("button.show").on("click", this.showAPI.api.bind(this.showAPI));
+    this.deleteAPI = new DeleteAPIView(this.gateway, this.uiview, this.model);
+    this.uiview.$el.find("button.delete").on("click", this.deleteAPI.api.bind(this.deleteAPI));
     this.schemaAPI = new SchemaAPIView(this.gateway, this.uiview, this.model);
     this.uiview.$el.find("button.schema").on("click", this.schemaAPI.api.bind(this.schemaAPI));
     this.listingAPI = new ListingAPIView(this.gateway, this.uiview, this.model);

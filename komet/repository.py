@@ -37,8 +37,8 @@ class DefaultSQLARepository(object):
 
         if page:
             q = q.offset(limit * page)
-        if limit:
-            q = q.limit(limit)
+            if limit:
+                q = q.limit(limit)
         return q
 
     def __iter__(self):

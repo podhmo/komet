@@ -1,19 +1,15 @@
 # -*- coding:utf-8 -*-
+import copy
 from zope.interface import implementer
-
 from .interfaces import (
     IExecutor
 )
-
-
-class ValidationError(Exception):
-    def __init__(self, params, errors, ob=None):
-        self.initials = params
-        self.errors = errors
-        self.ob = ob
-
-    def as_dict(self):
-        return self.errors
+from alchemyjsonschema.dictify import (
+    normalize,
+    validate_all
+)
+from jsonschema import FormatChecker
+from jsonschema.validators import Draft4Validator
 
 
 @implementer(IExecutor)
@@ -31,22 +27,37 @@ class Executor(object):
 
 
 class CreateExecutor(Executor):
+    def customize_schema(self, schema):
+        schema = copy.deepcopy(schema)
+        # when creating model, id is not needed.
+        if "id" in schema["required"]:
+            schema["required"].remove("id")
+        return schema
+
     def validation(self, ob=None):
-        self.params = self.raw_params
-        # raise ValidationError()
+        schema = self.customize_schema(self.context.schema)
+        schema_validator = Draft4Validator(schema, format_checker=FormatChecker())
+        validate_all(self.raw_params, schema_validator)
+        self.params = normalize(self.raw_params, schema)
 
     def execute(self, ob=None):
         if self.params is None:
             raise RuntimeError("execute after validation")
         ob = self.context.modelclass(**self.params)
         self.context.session.add(ob)
+        self.context.session.flush()
         return ob
 
 
 class EditExecutor(Executor):
-    def validation(self):
-        self.params = self.raw_params
-        # raise ValidationError()
+    def customize_schema(self, schema):
+        return schema
+
+    def validation(self, ob):
+        schema = self.customize_schema(self.context.schema)
+        schema_validator = Draft4Validator(schema, format_checker=FormatChecker())
+        validate_all(self.raw_params, schema_validator)
+        self.params = normalize(self.raw_params, schema)
 
     def execute(self, ob):
         if self.params is None:
@@ -58,12 +69,9 @@ class EditExecutor(Executor):
 
 
 class DeleteExecutor(Executor):
-    def validation(self):
+    def validation(self, ob):
         self.params = self.raw_params
-        # raise ValidationError()
 
     def execute(self, ob):
-        if self.params is None:
-            raise RuntimeError("execute after validation")
         self.context.session.delete(ob)
         return ob

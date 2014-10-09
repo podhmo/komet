@@ -55,13 +55,6 @@ class IExecutor(Interface):
         pass
 
 
-class IValidationError(Interface):
-    initials = Attribute("")
-
-    def as_dict():
-        pass
-
-
 class IIndexFromRequest(Interface):
     def __call__(request):
         """get index from request (usually from request.matchdict)"""
