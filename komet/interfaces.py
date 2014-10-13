@@ -55,7 +55,12 @@ class IExecutor(Interface):
         pass
 
 
-class IValidation(Interface):
+class ISchemaValidation(Interface):
+    def __call__(context, params):
+        pass
+
+
+class IDataValidation(Interface):
     def __call__(context, params, ob=None):
         pass
 

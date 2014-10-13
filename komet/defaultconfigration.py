@@ -96,10 +96,17 @@ def includeme(config):
     config.registry.adapters.register([i.IEdit], i.IExecutor, "", config.maybe_dotted(".executors.EditExecutor"))
     config.registry.adapters.register([i.IDelete], i.IExecutor, "", config.maybe_dotted(".executors.DeleteExecutor"))
 
+    def dummy_data_validation(context, params, ob):
+        return params
+
+    config.registry.adapters.register([i.ICreate], i.IDataValidation, "", dummy_data_validation)
+    config.registry.adapters.register([i.IEdit], i.IDataValidation, "", dummy_data_validation)
+    config.registry.adapters.register([i.IDelete], i.IDataValidation, "", dummy_data_validation)
+
     # jsonschema
-    config.registry.adapters.register([i.ICreate], i.IValidation, "", config.maybe_dotted(".executors.create_jsonschema_validation"))
-    config.registry.adapters.register([i.IEdit], i.IValidation, "", config.maybe_dotted(".executors.edit_jsonschema_validation"))
-    config.registry.adapters.register([i.IDelete], i.IValidation, "", config.maybe_dotted(".executors.delete_jsonschema_validation"))
+    config.registry.adapters.register([i.ICreate], i.ISchemaValidation, "", config.maybe_dotted(".executors.create_jsonschema_validation"))
+    config.registry.adapters.register([i.IEdit], i.ISchemaValidation, "", config.maybe_dotted(".executors.edit_jsonschema_validation"))
+    config.registry.adapters.register([i.IDelete], i.ISchemaValidation, "", config.maybe_dotted(".executors.delete_jsonschema_validation"))
 
     from alchemyjsonschema import SingleModelWalker, SchemaFactory
     factory = SchemaFactory(SingleModelWalker)
