@@ -32,6 +32,8 @@ class CreateExecutor(Executor):
         # when creating model, id is not needed.
         if "id" in schema["required"]:
             schema["required"].remove("id")
+        if "id" in schema["properties"]:
+            schema["properties"].pop("id")
         return schema
 
     def validation(self, ob=None):
