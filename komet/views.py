@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from alchemyjsonschema.dictify import ErrorFound
+from .executors import ValidationError
 from .httpexceptions import APINotFound
 from .interfaces import (
     ICreate,
@@ -12,7 +12,7 @@ def create(context, request):
     executor = context.get_executor(ICreate)
     try:
         executor.validation(ob=None)
-    except ErrorFound as e:
+    except ValidationError as e:
         raise context.httpexception(e)
     ob = executor.execute()
     return ob
@@ -44,7 +44,7 @@ def edit(context, request):
     executor = context.get_executor(IEdit)
     try:
         executor.validation(ob=ob)
-    except ErrorFound as e:
+    except ValidationError as e:
         raise context.httpexception(e)
     ob = executor.execute(ob=ob)
     return ob
@@ -58,7 +58,7 @@ def delete(context, request):
     executor = context.get_executor(IDelete)
     try:
         executor.validation(ob=ob)
-    except ErrorFound as e:
+    except ValidationError as e:
         raise context.httpexception(e)
     ob = executor.execute(ob=ob)
     return ob  # dummy?

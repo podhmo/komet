@@ -53,7 +53,7 @@ class KometResource(object):
         return fn(self, self.request.json_body)
 
     def httpexception(self, err):
-        return APIBadRequest(err)  # xxx
+        return APIBadRequest(err.args[0])  # xxx
 
 
 def resource_factory(modelclass):

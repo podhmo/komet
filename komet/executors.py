@@ -11,10 +11,15 @@ from .interfaces import (
 )
 from alchemyjsonschema.dictify import (
     normalize,
-    validate_all
+    validate_all,
+    ErrorFound
 )
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft4Validator
+
+
+class ValidationError(Exception):
+    pass
 
 
 @implementer(IExecutor)
@@ -85,14 +90,20 @@ def create_jsonschema_validation(context, params, ob=None):
 
     schema = customize_schema(context.schema)
     schema_validator = Draft4Validator(schema, format_checker=FormatChecker())
-    validate_all(params, schema_validator)
+    try:
+        validate_all(params, schema_validator)
+    except ErrorFound as err:
+        raise ValidationError({e.path[0]: e.message for e in err.errors})
     return normalize(params, schema)
 
 
 def edit_jsonschema_validation(context, params):
     schema = context.schema
     schema_validator = Draft4Validator(schema, format_checker=FormatChecker())
-    validate_all(params, schema_validator)
+    try:
+        validate_all(params, schema_validator)
+    except ErrorFound as err:
+        raise ValidationError({e.path[0]: e.message for e in err.errors})
     return normalize(params, schema)
 
 
