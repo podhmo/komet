@@ -22,3 +22,8 @@ class APIBadRequest(APIError):
 class APIUnauthorized(APIError):
     code = 401
     msg = "Unauthorized"
+
+
+class APINotFound(APIError):
+    code = 404
+    msg = "Not found"

@@ -97,6 +97,10 @@ def includeme(config):
     config.registry.adapters.register([i.IDelete], i.IExecutor, "", config.maybe_dotted(".executors.DeleteExecutor"))
 
     # jsonschema
+    config.registry.adapters.register([i.ICreate], i.IValidation, "", config.maybe_dotted(".executors.create_jsonschema_validation"))
+    config.registry.adapters.register([i.IEdit], i.IValidation, "", config.maybe_dotted(".executors.edit_jsonschema_validation"))
+    config.registry.adapters.register([i.IDelete], i.IValidation, "", config.maybe_dotted(".executors.delete_jsonschema_validation"))
+
     from alchemyjsonschema import SingleModelWalker, SchemaFactory
     factory = SchemaFactory(SingleModelWalker)
     config.registry.registerUtility(factory, i.ISchemaFactory)

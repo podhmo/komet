@@ -55,6 +55,11 @@ class IExecutor(Interface):
         pass
 
 
+class IValidation(Interface):
+    def __call__(context, params, ob=None):
+        pass
+
+
 class IIndexFromRequest(Interface):
     def __call__(request):
         """get index from request (usually from request.matchdict)"""

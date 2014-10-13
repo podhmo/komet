@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from alchemyjsonschema.dictify import ErrorFound
-from pyramid.httpexceptions import HTTPNotFound
+from .httpexceptions import APINotFound
 from .interfaces import (
     ICreate,
     IEdit,
@@ -32,7 +32,7 @@ def show(context, request):
     repository = context.repository
     ob = repository[context.get_index()]
     if ob is None:
-        raise HTTPNotFound("")
+        raise APINotFound("")
     return ob
 
 
@@ -40,7 +40,7 @@ def edit(context, request):
     repository = context.repository
     ob = repository[context.get_index()]
     if ob is None:
-        raise HTTPNotFound("")
+        raise APINotFound("")
     executor = context.get_executor(IEdit)
     try:
         executor.validation(ob=ob)
@@ -54,7 +54,7 @@ def delete(context, request):
     repository = context.repository
     ob = repository[context.get_index()]
     if ob is None:
-        raise HTTPNotFound("")
+        raise APINotFound("")
     executor = context.get_executor(IDelete)
     try:
         executor.validation(ob=ob)
