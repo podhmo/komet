@@ -69,10 +69,15 @@ def add_apiset(config, model, name=None, **kwargs):
 
 def add_custom_executor(config, model, scene, executor):
     name = model.__name__
-    config.registry.adapters([scene], i.IExecutor, name, executor)
+    config.registry.adapters.register([scene], i.IExecutor, name, executor)
 
 
-def add_dbsession(config, session):
+def add_custom_data_validation(config, model, scene, validation):
+    name = model.__name__
+    config.registry.adapters.register([scene], i.IDataValidation, name, validation)
+
+
+def set_dbsession(config, session):
     config.registry.registerUtility(session, i.IDBSession)
 
 
@@ -83,12 +88,19 @@ def add_model_renderer(config, Base):
     config.add_renderer("json", factory(Base))
 
 
+def initialize(config, Base, session):
+    config.set_komet_dbsession(session)
+    config.add_komet_model_renderer(Base)
+
+
 def includeme(config):
     config.include(define_default_apiset_builder)
     config.add_directive("add_komet_apiset", add_apiset)
-    config.add_directive("add_komet_dbsession", add_dbsession)
+    config.add_directive("set_komet_dbsession", set_dbsession)
     config.add_directive("add_komet_custom_executor", add_custom_executor)
+    config.add_directive("add_komet_custom_data_validation", add_custom_data_validation)
     config.add_directive("add_komet_model_renderer", add_model_renderer)
+    config.add_directive("komet_initialize", initialize)
 
     config.registry.registerUtility(index_from_request_default, i.IIndexFromRequest)
     config.registry.registerUtility(config.maybe_dotted(".repository.DefaultSQLARepository"), i.IRepository)

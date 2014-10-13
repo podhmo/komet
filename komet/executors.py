@@ -40,7 +40,8 @@ def default_validation(self, ifaces, ob=None):
     fn = self.context.customized_or_default(ifaces, ISchemaValidation)
     params = fn(self.context, self.raw_params)
     fn2 = self.context.customized_or_default(ifaces, IDataValidation)
-    return fn2(self.context, params, ob)
+    fn2(self.context, params, ob)
+    return params
 
 
 class CreateExecutor(Executor):

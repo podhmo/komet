@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     ## komet::
     config.include("komet")
-    config.add_komet_dbsession(Session)
+    config.set_komet_dbsession(Session)
     config.add_komet_model_renderer(Base)
     config.add_komet_apiset(User, "user")
 

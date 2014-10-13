@@ -21,9 +21,18 @@ def main(global_config, **settings):
     config.add_route('boo', '/boo')
 
     config.include("komet")
-    config.add_komet_dbsession(config.maybe_dotted(".models.DBSession"))
-    config.add_komet_model_renderer(config.maybe_dotted(".models.Base"))
-    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"), "mymodel")
+    config.komet_initialize(config.maybe_dotted(".models.Base"),
+                            config.maybe_dotted(".models.DBSession"))
+    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"),
+                            "mymodel", 
+                            validation=()
+    )
+
+    for iscene in ["komet.interfaces.ICreate", "komet.interfaces.IEdit"]:
+        config.add_komet_custom_data_validation(config.maybe_dotted(".models.MyModel"),
+                                                config.maybe_dotted(iscene),
+                                                config.maybe_dotted(".models.unique_name"))
+
 
     ## ui
     config.add_mako_renderer(".html")

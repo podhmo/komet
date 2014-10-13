@@ -25,3 +25,11 @@ class MyModel(Base):
     value = Column(Integer)
 
 Index('my_index', MyModel.name, unique=True, mysql_length=255)
+
+from sqlalchemy.sql import exists
+from komet.executors import ValidationError
+
+
+def unique_name(context, params, ob):
+    if context.session.query(exists().where(MyModel.name == params["name"])).scalar():
+        raise ValidationError({"name": "name is not unique"})
