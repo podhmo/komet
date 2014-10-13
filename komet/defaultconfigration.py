@@ -67,14 +67,14 @@ def add_apiset(config, model, name=None, **kwargs):
     builder.build(model, name=name, **kwargs)
 
 
-def add_custom_executor(config, model, scene, executor):
-    name = model.__name__
-    config.registry.adapters.register([scene], i.IExecutor, name, executor)
+def add_custom_executor(config, scene_name, model, executor):
+    builder = config.registry.getUtility(i.IAPISetBuilder)
+    builder.scene_manager.add_custom_executor(scene_name, model, executor)
 
 
-def add_custom_data_validation(config, model, scene, validation):
-    name = model.__name__
-    config.registry.adapters.register([scene], i.IDataValidation, name, validation)
+def add_custom_data_validation(config, scene_name, model, data_validation):
+    builder = config.registry.getUtility(i.IAPISetBuilder)
+    builder.scene_manager.add_custom_data_validation(scene_name, model, data_validation)
 
 
 def set_dbsession(config, session):

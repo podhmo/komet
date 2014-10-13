@@ -23,16 +23,7 @@ def main(global_config, **settings):
     config.include("komet")
     config.komet_initialize(config.maybe_dotted(".models.Base"),
                             config.maybe_dotted(".models.DBSession"))
-    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"),
-                            "mymodel", 
-                            validation=()
-    )
-
-    for iscene in ["komet.interfaces.ICreate", "komet.interfaces.IEdit"]:
-        config.add_komet_custom_data_validation(config.maybe_dotted(".models.MyModel"),
-                                                config.maybe_dotted(iscene),
-                                                config.maybe_dotted(".models.unique_name"))
-
+    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"), "mymodel")
 
     ## ui
     config.add_mako_renderer(".html")

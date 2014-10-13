@@ -75,21 +75,24 @@ class IScene(Interface):
 
 
 class IListing(IScene):
-    pass
+    name = Attribute("list")
 
 
 class ICreate(IScene):
-    pass
+    name = Attribute("create")
 
 
 class IEdit(IScene):
-    pass
+    name = Attribute("edit")
 
 
 class IDelete(IScene):
-    pass
+    name = Attribute("delete")
 
 
 class IShow(IScene):
-    pass
+    name = Attribute("show")
 
+
+class ISceneManager(Interface):
+    pass

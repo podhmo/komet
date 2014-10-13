@@ -53,6 +53,13 @@ def simple_commit_tween(handler, registry):  # todo:fix
     return tween
 
 
+def unique_name(context, params, ob):
+    from komet import ValidationError
+    from sqlalchemy.sql import exists
+    if context.session.query(exists().where(User.name == params["name"])).scalar():
+        raise ValidationError({"name": "name is not unique"})
+
+
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
     settings = {"mako.directories": here,
@@ -74,6 +81,10 @@ if __name__ == '__main__':
     config.set_komet_dbsession(Session)
     config.add_komet_model_renderer(Base)
     config.add_komet_apiset(User, "user")
+
+    config.add_komet_custom_data_validation("create", User, unique_name)
+    config.add_komet_custom_data_validation("edit", User, unique_name)
+
 
 
     ## ui::

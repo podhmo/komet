@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 import copy
+from pyramid.decorator import reify
 from .resources import resource_factory
+from . import interfaces as i
 
 """
 # how to use
@@ -65,14 +67,44 @@ class APISetCustomizer(object):  # todo rename
         return model.__name__.lower()
 
 
+class SceneManager(object):
+    def __init__(self, config):
+        self.config = config
+        self.scenes = {}
+
+    def register(self, scene):
+        if scene:
+            name = scene._InterfaceClass__attrs["name"].__name__
+            self.scenes[name] = scene
+
+    def add_custom_executor(self, scene_name, model, executor):
+        scene = self.scenes[scene_name]
+        name = model.__name__
+        self.config.registry.adapters.register([scene], i.IExecutor, name, executor)
+
+    def add_custom_data_validation(self, scene_name, model, data_validation):
+        scene = self.scenes[scene_name]
+        name = model.__name__
+        self.config.registry.adapters.register([scene], i.IDataValidation, name, data_validation)
+
+
 class APISetBuilder(object):
     def __init__(self, config, customizer=None, definitions=None):
         self.config = config
         self.customizer = customizer or APISetCustomizer()
         self.definitions = definitions or {}
 
+    @reify
+    def scene_manager(self):
+        scene_manager = self.config.registry.queryUtility(i.ISceneManager)
+        if scene_manager is None:
+            scene_manager = SceneManager(self.config)
+            self.config.registry.registerUtility(scene_manager, i.ISceneManager)
+        return scene_manager
+
     def define(self, route, scene, path, view, **kwargs):
         self.definitions[(route, scene)] = (path, view, kwargs)
+        self.scene_manager.register(scene)
 
     def __copy__(self):
         definitions = copy.copy(self.definitions)
