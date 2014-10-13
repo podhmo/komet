@@ -1,7 +1,5 @@
 # -*- coding:utf-8 -*-
-
 import os
-import sys
 
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
@@ -13,29 +11,34 @@ try:
 except IOError:
     README = CHANGES = ''
 
-install_requires=[
+
+install_requires = [
     'setuptools',
     'pyramid',
     'sqlalchemy',
     'alchemyjsonschema'
-    ]
+]
+
 
 docs_extras = [
-    ]
+]
 
-tests_require =[
+tests_require = [
     "pytest"
 ]
+
 testing_extras = tests_require + [
-    ]
+]
 
 from setuptools.command.test import test as TestCommand
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
+
     def run_tests(self):
         import pytest
         pytest.main(self.test_args)
@@ -44,11 +47,11 @@ class PyTest(TestCommand):
 setup(name='komet',
       version='0.0',
       description='-',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: Implementation :: CPython",
-        ],
+          "Programming Language :: Python",
+          "Programming Language :: Python :: Implementation :: CPython",
+      ],
       keywords='',
       author="",
       author_email="",
@@ -58,16 +61,13 @@ setup(name='komet',
       zip_safe=False,
       install_requires=install_requires,
       extras_require={
-          'testing':testing_extras,
-          'docs':docs_extras,
-          },
+          'testing': testing_extras,
+          'docs': docs_extras,
+      },
       tests_require=tests_require,
       cmdclass={'test': PyTest},
-      entry_points= """
+      entry_points="""
       [console_scripts]
       pviewlist = komet.scripts.pviewlist:main
       """
-      )
-
-
-
+)
