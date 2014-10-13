@@ -57,14 +57,17 @@ setup(name='komet',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = install_requires,
-      extras_require = {
+      install_requires=install_requires,
+      extras_require={
           'testing':testing_extras,
           'docs':docs_extras,
           },
-      tests_require = tests_require,
-      cmdclass = {'test': PyTest},
-      entry_points = """      """
+      tests_require=tests_require,
+      cmdclass={'test': PyTest},
+      entry_points= """
+      [console_scripts]
+      pviewlist = komet.scripts.pviewlist:main
+      """
       )
 
 
