@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from pyramid.decorator import reify
-from pyramid.httpexceptions import HTTPBadRequest
+from .httpexceptions import APIBadRequest
 from zope.interface import implementer
 from . import interfaces as i
 
@@ -53,7 +53,7 @@ class KometResource(object):
         return fn(self, self.request.json_body)
 
     def httpexception(self, err):
-        return HTTPBadRequest(err)  # xxx
+        return APIBadRequest(err)  # xxx
 
 
 def resource_factory(modelclass):
