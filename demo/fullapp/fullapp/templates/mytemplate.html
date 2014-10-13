@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script type="text/javascript" src="bower/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="static/js/app.js"></script>
+
+<script>
+$(function(){
+  window.app = new apps.App("#mymodel", "/mymodels");
+})
+</script>
+</head>
+<body>
+  <h1>Mymodel</h1>
+  <section id="mymodel">
+    <h3>input</h3>
+    <pre class="input">
+      {}
+    </pre>
+
+    <h3>form</h3>
+    <div>
+      <label><span>id:</span><input name="id" type="number"></input></label>
+    </div>
+    <div>
+      <label><span>name:</span><input name="name" type="text"></input></label>
+    </div>
+    <div>
+      <label><span>value:</span><input name="value" type="number"></input></label>
+    </div>
+    <button class="create">create</button>
+    <button class="show">show</button>
+    <button class="edit">edit</button>
+    <button class="delete">delete</button>
+    <button class="listing">listing</button>
+    <button class="schema">schema</button>
+    <h3>output</h3>
+    <pre class="output">
+      {}
+    </pre>
+  </section>
+</body>
+</html>

@@ -37,7 +37,7 @@ def top_view(request):
 
 
 def simple_commit_tween(handler, registry):  # todo:fix
-    from pyramid.httpexceptions import HTTPBadRequest
+    from komet.httpexceptions import APIBadRequest
 
     def tween(request):
         try:
@@ -48,7 +48,7 @@ def simple_commit_tween(handler, registry):  # todo:fix
             logger.exception(e)
             if hasattr(request.context, "session"):
                 request.context.session.rollback()
-            return HTTPBadRequest(e)
+            return APIBadRequest(repr(e))
         return response
     return tween
 
