@@ -33,4 +33,3 @@ class ModelRendererFactory(object):
     def __call__(self, Base):
         self.renderer.add_adapter(Base, self.jsonify)
         return self.renderer
-

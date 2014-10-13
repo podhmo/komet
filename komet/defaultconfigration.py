@@ -93,6 +93,37 @@ def initialize(config, Base, session):
     config.add_komet_model_renderer(Base)
 
 
+class CachedSchemaFactory(object):
+    def __init__(self, schema_factory):
+        self.schema_factory = schema_factory
+        self.cache = {}
+
+    def for_cache(self, x):
+        if x is None:
+            return None
+        elif isinstance(x, (tuple, list)):
+            return tuple(x)
+        elif hasattr(x, "items"):
+            return tuple(x.items())
+        else:
+            return x
+
+    def __getattr__(self, k):
+        return getattr(self.schema_factory, k)
+
+    def __call__(self, src, includes=None, excludes=None, overrides=None, depth=None):
+        k_includes = self.for_cache(includes)
+        k_excludes = self.for_cache(excludes)
+        k_overrides = self.for_cache(overrides)
+        k_depth = self.for_cache(depth)
+        k = tuple([src, k_includes, k_excludes, k_overrides, k_depth])
+        try:
+            return self.cache[k]
+        except KeyError:
+            v = self.cache[k] = self.schema_factory(src, includes=includes, excludes=excludes, overrides=overrides, depth=depth)
+            return v
+
+
 def includeme(config):
     config.include(define_default_apiset_builder)
     config.add_directive("add_komet_apiset", add_apiset)
@@ -121,6 +152,5 @@ def includeme(config):
     config.registry.adapters.register([i.IDelete], i.ISchemaValidation, "", config.maybe_dotted(".executors.delete_jsonschema_validation"))
 
     from alchemyjsonschema import SingleModelWalker, SchemaFactory
-    factory = SchemaFactory(SingleModelWalker)
+    factory = CachedSchemaFactory(SchemaFactory(SingleModelWalker))
     config.registry.registerUtility(factory, i.ISchemaFactory)
-
