@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import copy
 from pyramid.decorator import reify
+from sqlalchemy.inspection import inspect
 from .resources import resource_factory
 from . import interfaces as i
 
@@ -27,14 +28,13 @@ def includeme(config):
 
 
 class APISetCustomizer(object):  # todo rename
-    def __init__(self, route, path, view, **kwargs):
+    def __init__(self, route, path, view,
+                 resource_factory=resource_factory, **kwargs):
         self.route = route
         self.path = path
         self.view = view
         self.kwargs = kwargs
-
-    def predicate(self):
-        return True
+        self.resource_factory = resource_factory
 
     def get_route_name(self, route, name):
         return self.route % dict(model=name)
@@ -43,7 +43,48 @@ class APISetCustomizer(object):  # todo rename
         return self.path % dict(model=name)
 
     def get_resource_factory(self, model):
-        return resource_factory(model)
+        return self.resource_factory(model)
+
+    def iterate(self, model):
+        yield self
+
+
+class IndirectAPISetCustomizer(object):  # todo rename
+    def __init__(self, route, path, view, predicate,
+                 resource_factory=resource_factory, **kwargs):
+        self.route = route
+        self.path = path
+        self.view = view
+        self.predicate = predicate
+        self.kwargs = kwargs
+        self.resource_factory = resource_factory
+
+    def detect_relationships(self, model):
+        mapper = inspect(model).mapper
+        return mapper.relationships
+
+    def iterate(self, model):
+        for prop in self.detect_relationships(model):
+            customizer = _ChildrenAPISetCustomizer(self, prop)
+            if self.predicate(customizer):
+                yield customizer
+
+
+class _ChildrenAPISetCustomizer(object):
+    def __init__(self, parent, prop):
+        self.parent = parent
+        self.prop = prop
+
+    def get_route_name(self, route, name):
+        suffix = self.prop.key
+        return self.parent.route % dict(model=name, child=suffix)
+
+    def get_path_name(self, model, name):
+        suffix = self.prop.key
+        return self.parent.path % dict(model=name, child=suffix)
+
+    def get_resource_factory(self, model):
+        return self.parent.resource_factory(model)
 
 
 class SceneManager(object):
@@ -88,8 +129,8 @@ class APISetBuilder(object):
 
     def build(self, model, name, **kwargs):
         registered = set()
-        for (scene, customizer) in self.definitions:
-            if customizer.predicate():
+        for (scene, _customizer) in self.definitions:
+            for customizer in _customizer.iterate(model):
                 fullroute = customizer.get_route_name(model, name)
                 fullpath = customizer.get_path_name(model, name)
 
