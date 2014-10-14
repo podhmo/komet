@@ -36,17 +36,17 @@ class Executor(object):
         raise NotImplemented
 
 
-def default_validation(self, ifaces, ob=None):
-    fn = self.context.customized_or_default(ifaces, ISchemaValidation)
+def default_validation(self, iface, ob=None, name=""):
+    fn = self.context.customized_or_default(iface, ISchemaValidation, name=name)
     params = fn(self.context, self.raw_params)
-    fn2 = self.context.customized_or_default(ifaces, IDataValidation)
+    fn2 = self.context.customized_or_default(iface, IDataValidation, name=name)
     fn2(self.context, params, ob)
     return params
 
 
 class CreateExecutor(Executor):
     def validation(self, ob=None):
-        self.params = default_validation(self, [ICreate], ob)
+        self.params = default_validation(self, ICreate, ob)
 
     def execute(self, ob=None):
         if self.params is None:
@@ -59,7 +59,7 @@ class CreateExecutor(Executor):
 
 class EditExecutor(Executor):
     def validation(self, ob=None):
-        self.params = default_validation(self, [IEdit], ob)
+        self.params = default_validation(self, IEdit, ob)
 
     def execute(self, ob):
         if self.params is None:
@@ -72,7 +72,7 @@ class EditExecutor(Executor):
 
 class DeleteExecutor(Executor):
     def validation(self, ob=None):
-        self.params = default_validation(self, [IDelete], ob)
+        self.params = default_validation(self, IDelete, ob)
 
     def execute(self, ob):
         self.context.session.delete(ob)

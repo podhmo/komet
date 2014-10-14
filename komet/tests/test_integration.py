@@ -19,6 +19,13 @@ class Point(Base):
     created_at = sa.Column(sa.DateTime(), nullable=False, default=datetime.now)
 
 
+class Person(Base):
+    __tablename__ = "person"
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String(255), nullable=False, unique=True)
+    age = sa.Column(sa.Integer, nullable=False)
+
+
 def setup_module(module):
     engine = sa.create_engine('sqlite:///:memory:', echo=False)
     DBSession.bind = engine
@@ -32,7 +39,6 @@ def make_config(settings):
 
     config.include("komet")
     config.komet_initialize(Base, DBSession)
-    config.add_komet_apiset(Point, "point")
     return config
 
 
@@ -41,9 +47,15 @@ def make_app(config):
     return app
 
 
+def default_settings():
+    # return {"debug_notfound": True, "debug_routematch": True}
+    return {}
+
+
 def test_it():
     from komet.testing import TestRESTApp
-    config = make_config({"debug_notfound": True, "debug_routematch": True})
+    config = make_config(default_settings())
+    config.add_komet_apiset(Point, "point")
     app = TestRESTApp(make_app(config))
 
     # listing model
@@ -76,3 +88,30 @@ def test_it():
     response = app.get_json("/points/")
     assert response.status_code == 200
     assert len(response.json_body) == 0
+
+
+def test_custom_validation():
+    from sqlalchemy.sql import exists
+    from komet.testing import TestRESTApp
+    from komet import ValidationError
+
+    config = make_config(default_settings())
+    config.add_komet_apiset(Person, "person")
+
+    def unique_name(context, params, ob):
+        if context.session.query(exists().where(Person.name == params["name"])).scalar():
+            raise ValidationError({"name": "name is not unique"})
+
+    config.add_komet_custom_data_validation("create", Person, unique_name)
+    config.add_komet_custom_data_validation("edit", Person, unique_name)
+
+    app = TestRESTApp(make_app(config))
+
+    # create model
+    params = {"name": "Foo", "age": 100}
+    response = app.post_json("/persons/", params)
+    assert response.status_code == 200
+
+    params = {"name": "Foo", "age": 100}
+    response = app.post_json("/persons/", params)
+    assert response.status_code == 400

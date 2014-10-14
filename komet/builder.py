@@ -77,15 +77,13 @@ class SceneManager(object):
             name = scene._InterfaceClass__attrs["name"].__name__
             self.scenes[name] = scene
 
-    def add_custom_executor(self, scene_name, model, executor):
+    def add_custom_executor(self, scene_name, model, executor, name=""):
         scene = self.scenes[scene_name]
-        name = model.__name__
-        self.config.registry.adapters.register([scene], i.IExecutor, name, executor)
+        self.config.registry.registerAdapter(executor, (model, scene), i.IExecutor, event=False, name=name)
 
-    def add_custom_data_validation(self, scene_name, model, data_validation):
+    def add_custom_data_validation(self, scene_name, model, data_validation, name=""):
         scene = self.scenes[scene_name]
-        name = model.__name__
-        self.config.registry.adapters.register([scene], i.IDataValidation, name, data_validation)
+        self.config.registry.registerAdapter(data_validation, (model, scene), i.IDataValidation, event=False, name=name)
 
 
 class APISetBuilder(object):
