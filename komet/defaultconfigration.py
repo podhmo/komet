@@ -14,52 +14,58 @@ def index_from_request_default(request):
 
 
 def define_default_apiset_builder(config):
-    builder = APISetBuilder(config, customizer=APISetCustomizer())
+    builder = APISetBuilder(config)
     config.registry.registerUtility(builder, i.IAPISetBuilder)
 
     # define api views
     builder.define(
-        route="%(model)s",
-        scene=i.IListing,
-        path="%(model)ss/",
-        view=".views.listing",
-        request_method="GET",
-        renderer="json")
+        i.IListing,
+        APISetCustomizer(
+            route="%(model)s",
+            path="%(model)ss/",
+            view=".views.listing",
+            request_method="GET",
+            renderer="json"))
     builder.define(
-        route="%(model)s",
-        scene=i.ICreate,
-        path="%(model)ss/",
-        view=".views.create",
-        request_method="POST",
-        renderer="json")
+        i.ICreate,
+        APISetCustomizer(
+            route="%(model)s",
+            path="%(model)ss/",
+            view=".views.create",
+            request_method="POST",
+            renderer="json"))
     builder.define(
-        route="%(model)s.unit",
-        scene=i.IShow,
-        path="%(model)ss/{id}/",
-        view=".views.show",
-        request_method="GET",
-        renderer="json")
+        i.IShow,
+        APISetCustomizer(
+            route="%(model)s.unit",
+            path="%(model)ss/{id}/",
+            view=".views.show",
+            request_method="GET",
+            renderer="json"))
     builder.define(
-        route="%(model)s.unit",
-        scene=i.IEdit,
-        path="%(model)ss/{id}/",
-        view=".views.edit",
-        request_method="PUT",
-        renderer="json")
+        i.IEdit,
+        APISetCustomizer(
+            route="%(model)s.unit",
+            path="%(model)ss/{id}/",
+            view=".views.edit",
+            request_method="PUT",
+            renderer="json"))
     builder.define(
-        route="%(model)s.unit",
-        scene=i.IDelete,
-        path="%(model)ss/{id}/",
-        view=".views.delete",
-        request_method="DELETE",
-        renderer="json")
+        i.IDelete,
+        APISetCustomizer(
+            route="%(model)s.unit",
+            path="%(model)ss/{id}/",
+            view=".views.delete",
+            request_method="DELETE",
+            renderer="json"))
     builder.define(
-        route="%(model)s.schema",
-        scene=None,
-        path="%(model)ss/schema",
-        view=".views.schema",
-        request_method="GET",
-        renderer="json")
+        None,
+        APISetCustomizer(
+            route="%(model)s.schema",
+            path="%(model)ss/schema",
+            view=".views.schema",
+            request_method="GET",
+            renderer="json"))
 
 
 def add_apiset(config, model, name=None, **kwargs):
