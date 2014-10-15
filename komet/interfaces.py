@@ -27,7 +27,7 @@ class IModelResource(Interface):
     def get_executor(scene):
         pass
 
-    def get_index():
+    def parser():
         pass
 
     def httpexception(err):
@@ -65,8 +65,11 @@ class IDataValidation(Interface):
         pass
 
 
-class IIndexFromRequest(Interface):
-    def __call__(request):
+class IRequestParser(Interface):
+    def get_index():
+        """get index from request (usually from request.matchdict)"""
+
+    def get_child_index():
         """get index from request (usually from request.matchdict)"""
 
 
@@ -94,5 +97,17 @@ class IShow(IScene):
     name = Attribute("show")
 
 
+class IAddChild(IScene):
+    name = Attribute("add_child")
+
+
+class IRemoveChild(IScene):
+    name = Attribute("remove_child")
+
+
 class ISceneManager(Interface):
+    pass
+
+
+class IName(Interface):  # xxx:
     pass

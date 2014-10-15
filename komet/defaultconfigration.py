@@ -9,9 +9,16 @@ from .builder import (
 from .renderers import ModelRendererFactory
 
 
-@provider(i.IIndexFromRequest)
-def index_from_request_default(request):
-    return request.matchdict["id"]
+@provider(i.IRequestParser)
+class IndexFromRequest(object):
+    def __init__(self, request):
+        self.request = request
+
+    def get_index(self):
+        return self.request.matchdict["id"]
+
+    def get_chlid_index(self):
+        return self.request.matchdict["child_id"]
 
 
 def define_default_apiset_builder(config):
@@ -19,6 +26,15 @@ def define_default_apiset_builder(config):
     config.registry.registerUtility(builder, i.IAPISetBuilder)
 
     # define api views
+    builder.define(
+        None,
+        APISetCustomizer(
+            route="%(model)s.schema",
+            path="%(model)s/schema/",
+            view=".views.schema",
+            request_method="GET",
+            renderer="json"))
+
     builder.define(
         i.IListing,
         APISetCustomizer(
@@ -59,29 +75,64 @@ def define_default_apiset_builder(config):
             view=".views.delete",
             request_method="DELETE",
             renderer="json"))
-    builder.define(
-        None,
-        APISetCustomizer(
-            route="%(model)s.schema",
-            path="%(model)s/schema/",
-            view=".views.schema",
-            request_method="GET",
-            renderer="json"))
 
     # children
-    from sqlalchemy.orm.base import ONETOMANY
+    from sqlalchemy.orm.base import ONETOMANY, MANYTOMANY
+
+    def has_children(customizer):
+        direction = customizer.prop.direction
+        return direction == ONETOMANY or direction == MANYTOMANY
+
     builder.define(
         i.IListing,
         IndirectAPISetCustomizer(
             route="%(model)s.%(child)s",
             path="%(model)s/{id}/%(child)s/",
             view=".views.listing_children",
-            predicate=lambda customizer: customizer.prop.direction == ONETOMANY,
+            predicate=has_children,
             request_method="GET",
             renderer="json"
         )
     )
+
+    builder.define(
+        i.IAddChild,
+        IndirectAPISetCustomizer(
+            route="%(model)s.%(child)s",
+            path="%(model)s/{id}/%(child)s/",
+            view=".views.create_child",
+            predicate=has_children,
+            request_method="POST",
+            renderer="json"
+        )
+    )
+
+    builder.define(
+        i.IAddChild,
+        IndirectAPISetCustomizer(
+            route="%(model)s.%(child)s.unit",
+            path="%(model)s/{id}/%(child)s/{child_id}",
+            view=".views.add_child",
+            predicate=has_children,
+            request_method="PUT",
+            renderer="json"
+        )
+    )
+
+    builder.define(
+        i.IRemoveChild,
+        IndirectAPISetCustomizer(
+            route="%(model)s.%(child)s.unit",
+            path="%(model)s/{id}/%(child)s/{child_id}",
+            view=".views.remove_child",
+            predicate=has_children,
+            request_method="DELETE",
+            renderer="json"
+        )
+    )
+
     from sqlalchemy.orm.base import MANYTOONE
+
     builder.define(
         i.IListing,
         IndirectAPISetCustomizer(
@@ -166,7 +217,7 @@ def includeme(config):
     config.add_directive("add_komet_model_renderer", add_model_renderer)
     config.add_directive("komet_initialize", initialize)
 
-    config.registry.registerUtility(index_from_request_default, i.IIndexFromRequest)
+    config.registry.registerUtility(IndexFromRequest, i.IRequestParser)
     config.registry.registerUtility(config.maybe_dotted(".repository.DefaultSQLARepository"), i.IRepository)
     config.registry.adapters.register([i.ICreate], i.IExecutor, "", config.maybe_dotted(".executors.CreateExecutor"))
     config.registry.adapters.register([i.IEdit], i.IExecutor, "", config.maybe_dotted(".executors.EditExecutor"))

@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 from sqlash import SerializerFactory
 import sqlalchemy.types as t
+from zope.interface import providedBy
+from .interfaces import IName
 
 
 def datetime_for_human(dt, r):
@@ -17,7 +19,10 @@ class ModelRendererFactory(object):
         self.serializer = SerializerFactory(convertions=convertions)()
 
     def jsonify(self, ob, request):
-        return self.serializer.serialize(ob, [":ALL:"])
+        result = self.serializer.serialize(ob, [":ALL:"])
+        result["type"] = ob.__class__.__name__
+        # result["resource"] = request.registry.adapters.lookup((providedBy(ob), ), IName)
+        return result
 
     def __call__(self, Base):
         self.renderer.add_adapter(Base, self.jsonify)

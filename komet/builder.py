@@ -141,6 +141,8 @@ class APISetBuilder(object):
 
     def build(self, model, name, **kwargs):
         registered = set()
+        self.config.registry.registerAdapter(name, (model, ), i.IName, event=False)
+
         for (scene, _customizer) in self.definitions:
             for customizer in _customizer.iterate(model):
                 fullroute = customizer.get_route_name(model, name)

@@ -11,6 +11,9 @@ class KometResource(object):
         self.request = request
         self.modelclass = modelclass
 
+    def get_another_resource(self, modelclass):
+        return self.__class__(self.request, modelclass)
+
     @reify
     def adapter(self):
         return self.request.registry.adapters.lookup
@@ -31,8 +34,9 @@ class KometResource(object):
     def schema(self):
         return self.utility(i.ISchemaFactory)(self.modelclass)
 
-    def get_index(self):
-        return self.utility(i.IIndexFromRequest)(self.request)
+    @reify
+    def parser(self):
+        return self.utility(i.IRequestParser)(self.request)
 
     def customized_or_default(self, src, dst, name=""):
         fn = self.adapter((implementedBy(self.modelclass), src), dst, name=name)
