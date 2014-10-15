@@ -80,7 +80,7 @@ if __name__ == '__main__':
     config.include("komet")
     config.set_komet_dbsession(Session)
     config.add_komet_model_renderer(Base)
-    config.add_komet_apiset(User, "user")
+    config.add_komet_apiset(User, "users")
 
     config.add_komet_custom_data_validation("create", User, unique_name)
     config.add_komet_custom_data_validation("edit", User, unique_name)

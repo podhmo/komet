@@ -16,7 +16,8 @@ install_requires = [
     'setuptools',
     'pyramid',
     'sqlalchemy',
-    'alchemyjsonschema'
+    'alchemyjsonschema',
+    'sqlash'
 ]
 
 

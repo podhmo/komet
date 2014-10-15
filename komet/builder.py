@@ -75,6 +75,14 @@ class _ChildrenAPISetCustomizer(object):
         self.parent = parent
         self.prop = prop
 
+    @property
+    def kwargs(self):
+        return self.parent.kwargs
+
+    @property
+    def view(self):
+        return self.parent.view
+
     def get_route_name(self, route, name):
         suffix = self.prop.key
         return self.parent.route % dict(model=name, child=suffix)
@@ -84,7 +92,11 @@ class _ChildrenAPISetCustomizer(object):
         return self.parent.path % dict(model=name, child=suffix)
 
     def get_resource_factory(self, model):
-        return self.parent.resource_factory(model)
+        def resource_factory(request):
+            resource = self.parent.resource_factory(model)(request)
+            resource.prop = self.prop  # xxx: this is hack using .views.listing_children
+            return resource
+        return resource_factory
 
 
 class SceneManager(object):

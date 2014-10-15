@@ -3,7 +3,8 @@ from zope.interface import provider
 from . import interfaces as i
 from .builder import (
     APISetBuilder,
-    APISetCustomizer
+    APISetCustomizer,
+    IndirectAPISetCustomizer
 )
 from .renderers import ModelRendererFactory
 
@@ -22,7 +23,7 @@ def define_default_apiset_builder(config):
         i.IListing,
         APISetCustomizer(
             route="%(model)s",
-            path="%(model)ss/",
+            path="%(model)s/",
             view=".views.listing",
             request_method="GET",
             renderer="json"))
@@ -30,7 +31,7 @@ def define_default_apiset_builder(config):
         i.ICreate,
         APISetCustomizer(
             route="%(model)s",
-            path="%(model)ss/",
+            path="%(model)s/",
             view=".views.create",
             request_method="POST",
             renderer="json"))
@@ -38,7 +39,7 @@ def define_default_apiset_builder(config):
         i.IShow,
         APISetCustomizer(
             route="%(model)s.unit",
-            path="%(model)ss/{id}/",
+            path="%(model)s/{id}/",
             view=".views.show",
             request_method="GET",
             renderer="json"))
@@ -46,7 +47,7 @@ def define_default_apiset_builder(config):
         i.IEdit,
         APISetCustomizer(
             route="%(model)s.unit",
-            path="%(model)ss/{id}/",
+            path="%(model)s/{id}/",
             view=".views.edit",
             request_method="PUT",
             renderer="json"))
@@ -54,7 +55,7 @@ def define_default_apiset_builder(config):
         i.IDelete,
         APISetCustomizer(
             route="%(model)s.unit",
-            path="%(model)ss/{id}/",
+            path="%(model)s/{id}/",
             view=".views.delete",
             request_method="DELETE",
             renderer="json"))
@@ -62,10 +63,36 @@ def define_default_apiset_builder(config):
         None,
         APISetCustomizer(
             route="%(model)s.schema",
-            path="%(model)ss/schema",
+            path="%(model)s/schema/",
             view=".views.schema",
             request_method="GET",
             renderer="json"))
+
+    # children
+    from sqlalchemy.orm.base import ONETOMANY
+    builder.define(
+        i.IListing,
+        IndirectAPISetCustomizer(
+            route="%(model)s.%(child)s",
+            path="%(model)s/{id}/%(child)s/",
+            view=".views.listing_children",
+            predicate=lambda customizer: customizer.prop.direction == ONETOMANY,
+            request_method="GET",
+            renderer="json"
+        )
+    )
+    from sqlalchemy.orm.base import MANYTOONE
+    builder.define(
+        i.IListing,
+        IndirectAPISetCustomizer(
+            route="%(model)s.%(child)s",
+            path="%(model)s/{id}/%(child)s/",
+            view=".views.show_child",
+            predicate=lambda customizer: customizer.prop.direction == MANYTOONE,
+            request_method="GET",
+            renderer="json"
+        )
+    )
 
 
 def add_apiset(config, model, name=None, **kwargs):

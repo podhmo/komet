@@ -24,6 +24,22 @@ def listing(context, request):
     return obs
 
 
+def listing_children(context, request):
+    repository = context.repository
+    ob = repository[context.get_index()]
+    if ob is None:
+        raise APINotFound("")
+    return list(getattr(ob, context.prop.key))
+
+
+def show_child(context, request):
+    repository = context.repository
+    ob = repository[context.get_index()]
+    if ob is None:
+        raise APINotFound("")
+    return getattr(ob, context.prop.key)
+
+
 def schema(context, request):
     return context.schema
 

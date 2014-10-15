@@ -23,9 +23,9 @@ def main(global_config, **settings):
     config.include("komet")
     config.komet_initialize(config.maybe_dotted(".models.Base"),
                             config.maybe_dotted(".models.DBSession"))
-    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"), "mymodel")
-    config.add_komet_apiset(config.maybe_dotted(".models.User"), "user")
-    config.add_komet_apiset(config.maybe_dotted(".models.Group"), "group")
+    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"), "mymodels")
+    config.add_komet_apiset(config.maybe_dotted(".models.User"), "users")
+    config.add_komet_apiset(config.maybe_dotted(".models.Group"), "groups")
     ## ui
     config.add_mako_renderer(".html")
     config.add_static_view("bower", '../bower_components')

@@ -55,7 +55,7 @@ def default_settings():
 def test_it():
     from komet.testing import TestRESTApp
     config = make_config(default_settings())
-    config.add_komet_apiset(Point, "point")
+    config.add_komet_apiset(Point, "points")
     app = TestRESTApp(make_app(config))
 
     # listing model
@@ -96,7 +96,7 @@ def test_custom_validation():
     from komet import ValidationError
 
     config = make_config(default_settings())
-    config.add_komet_apiset(Person, "person")
+    config.add_komet_apiset(Person, "people")
 
     def unique_name(context, params, ob):
         if context.session.query(exists().where(Person.name == params["name"])).scalar():
@@ -109,9 +109,9 @@ def test_custom_validation():
 
     # create model
     params = {"name": "Foo", "age": 100}
-    response = app.post_json("/persons/", params)
+    response = app.post_json("/people/", params)
     assert response.status_code == 200
 
     params = {"name": "Foo", "age": 100}
-    response = app.post_json("/persons/", params)
+    response = app.post_json("/people/", params)
     assert response.status_code == 400
