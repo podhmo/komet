@@ -17,7 +17,7 @@ class IndexFromRequest(object):
     def get_index(self):
         return self.request.matchdict["id"]
 
-    def get_chlid_index(self):
+    def get_child_index(self):
         return self.request.matchdict["child_id"]
 
 
@@ -111,7 +111,7 @@ def define_default_apiset_builder(config):
         i.IAddChild,
         IndirectAPISetCustomizer(
             route="%(model)s.%(child)s.unit",
-            path="%(model)s/{id}/%(child)s/{child_id}",
+            path="%(model)s/{id}/%(child)s/{child_id}/",
             view=".views.add_child",
             predicate=has_children,
             request_method="PUT",
@@ -123,7 +123,7 @@ def define_default_apiset_builder(config):
         i.IRemoveChild,
         IndirectAPISetCustomizer(
             route="%(model)s.%(child)s.unit",
-            path="%(model)s/{id}/%(child)s/{child_id}",
+            path="%(model)s/{id}/%(child)s/{child_id}/",
             view=".views.remove_child",
             predicate=has_children,
             request_method="DELETE",

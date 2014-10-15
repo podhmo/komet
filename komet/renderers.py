@@ -1,10 +1,21 @@
 # -*- coding:utf-8 -*-
 from sqlash import SerializerFactory
 import sqlalchemy.types as t
+from functools import wraps
 from zope.interface import providedBy
 from .interfaces import IName
 
 
+def maybe_none(fn):
+    @wraps(fn)
+    def wrapper(v, r):
+        if v is None:
+            return None
+        return fn(v, r)
+    return wrapper
+
+
+@maybe_none
 def datetime_for_human(dt, r):
     return dt.strftime("%Y/%m/%dT%H:%M:%S.%f%z")
 
