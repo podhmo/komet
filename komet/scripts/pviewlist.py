@@ -9,7 +9,7 @@ def main():
     registry = env["registry"]
     introspector = registry.introspector
 
-    print("{path:^25} {method:^6} {view_name:^20}".format(
+    print("{path:^40} {method:^6} {view_name:^20}".format(
         path="Path",
         method="Method",
         view_name="View"))
@@ -24,7 +24,7 @@ def main():
                 break
 
         if route:
-            print("{path:<25} {method:<6} {view_name:<20}".format(
+            print("{path:<40} {method:<6} {view_name:<20}".format(
                 path=route["pattern"],
                 method=view["request_methods"] or "-",
                 view_name=view_name(view["callable"], view["attr"])
