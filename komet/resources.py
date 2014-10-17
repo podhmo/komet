@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
+import copy
 from pyramid.decorator import reify
-from .httpexceptions import APIBadRequest
 from zope.interface import implementer, implementedBy
+from .httpexceptions import APIBadRequest
 from . import interfaces as i
 
 
@@ -33,6 +34,16 @@ class KometResource(object):
     @reify
     def schema(self):
         return self.utility(i.ISchemaFactory)(self.modelclass)
+
+    @reify
+    def schema_information(self):
+        link_manager = self.adapter((implementedBy(self.modelclass), ), i.IModelLinkManager) or []
+        schema = copy.copy(self.schema)
+        links = []
+        for link in link_manager:
+            links.append(link)
+        schema["links"] = links
+        return schema
 
     @reify
     def parser(self):

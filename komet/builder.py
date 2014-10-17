@@ -2,6 +2,8 @@
 import copy
 from pyramid.decorator import reify
 from sqlalchemy.inspection import inspect
+from zope.interface import implementedBy, implementer
+from collections import namedtuple
 from .resources import resource_factory
 from . import interfaces as i
 
@@ -131,19 +133,26 @@ class APISetBuilder(object):
             self.config.registry.registerUtility(scene_manager, i.ISceneManager)
         return scene_manager
 
-    def define(self, scene, customizer):
-        self.definitions.append((scene, customizer))
+    def define(self, scene, customizer, description):
+        self.definitions.append((scene, customizer, description))
         self.scene_manager.register(scene)
 
     def __copy__(self):
         definitions = copy.copy(self.definitions)
         return self.__class__(self.config, definitions)
 
+    def get_link_manager(self, model):
+        manager = self.config.registry.adapters.lookup((implementedBy(model)), i.IModelLinkManager)
+        if manager is None:
+            manager = ModelLinkManager()
+            self.config.registry.registerAdapter(manager, (model, ), i.IModelLinkManager, event=False)
+        return manager
+
     def build(self, model, name, **kwargs):
         registered = set()
-        self.config.registry.registerAdapter(name, (model, ), i.IName, event=False)
+        link_manager = self.get_link_manager(model)
 
-        for (scene, _customizer) in self.definitions:
+        for (scene, _customizer, description) in self.definitions:
             for customizer in _customizer.iterate(model):
                 fullroute = customizer.get_route_name(model, name)
                 fullpath = customizer.get_path_name(model, name)
@@ -157,3 +166,26 @@ class APISetBuilder(object):
                 kw.update(customizer.kwargs)
                 kw.update(kwargs)
                 self.config.add_view(customizer.view, route_name=fullroute, **kw)
+
+                link_manager.register(
+                    ModelLink(title=description % dict(model=model.__name__), rel="self", method=kw.get("request_method", "GET"), href=fullpath))
+
+
+@implementer(i.IModelLink)
+class ModelLink(object):
+    def __init__(self, title, rel, method, href):
+        self.title = title
+        self.rel = rel
+        self.method = method
+        self.href = href
+
+
+class ModelLinkManager(object):
+    def __init__(self):
+        self.links = []
+
+    def register(self, modellink):
+        self.links.append(modellink)
+
+    def __iter__(self):
+        return iter(self.links)

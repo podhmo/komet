@@ -2,8 +2,7 @@
 from sqlash import SerializerFactory
 import sqlalchemy.types as t
 from functools import wraps
-from zope.interface import providedBy
-from .interfaces import IName
+from .builder import ModelLink
 
 
 def maybe_none(fn):
@@ -29,12 +28,21 @@ class ModelRendererFactory(object):
         self.renderer = renderer
         self.serializer = SerializerFactory(convertions=convertions)()
 
-    def jsonify(self, ob, request):
+    def jsonify_sqlaobject(self, ob, request):
         result = self.serializer.serialize(ob, [":ALL:"])
         result["type"] = ob.__class__.__name__
-        # result["resource"] = request.registry.adapters.lookup((providedBy(ob), ), IName)
         return result
 
+    def jsonify_model_link(self, ob, request):
+        return {
+            "title": ob.title,
+            "method": ob.method,
+            "href": ob.href,
+            "rel": ob.rel,
+            "mediaType": "application/json"
+        }
+
     def __call__(self, Base):
-        self.renderer.add_adapter(Base, self.jsonify)
+        self.renderer.add_adapter(Base, self.jsonify_sqlaobject)
+        self.renderer.add_adapter(ModelLink, self.jsonify_model_link)
         return self.renderer

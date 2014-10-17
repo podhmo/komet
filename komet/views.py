@@ -84,7 +84,7 @@ def show_child(context, request):  # xxx:
 
 
 def schema(context, request):
-    return context.schema
+    return context.schema_information
 
 
 def show(context, request):

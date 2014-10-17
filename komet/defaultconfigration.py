@@ -33,7 +33,9 @@ def define_default_apiset_builder(config):
             path="%(model)s/schema/",
             view=".views.schema",
             request_method="GET",
-            renderer="json"))
+            renderer="json"),
+        "getting schema information of %(model)s"
+    )
 
     builder.define(
         i.IListing,
@@ -42,7 +44,10 @@ def define_default_apiset_builder(config):
             path="%(model)s/",
             view=".views.listing",
             request_method="GET",
-            renderer="json"))
+            renderer="json"),
+        "list %(model)s objects"
+    )
+
     builder.define(
         i.ICreate,
         APISetCustomizer(
@@ -50,7 +55,10 @@ def define_default_apiset_builder(config):
             path="%(model)s/",
             view=".views.create",
             request_method="POST",
-            renderer="json"))
+            renderer="json"),
+        "create %(model)s object"
+    ),
+
     builder.define(
         i.IShow,
         APISetCustomizer(
@@ -58,7 +66,9 @@ def define_default_apiset_builder(config):
             path="%(model)s/{id}/",
             view=".views.show",
             request_method="GET",
-            renderer="json"))
+            renderer="json"),
+        "detail information about %(model)s object"
+    )
     builder.define(
         i.IEdit,
         APISetCustomizer(
@@ -66,7 +76,9 @@ def define_default_apiset_builder(config):
             path="%(model)s/{id}/",
             view=".views.edit",
             request_method="PUT",
-            renderer="json"))
+            renderer="json"),
+        "edit %(model)s object"
+    )
     builder.define(
         i.IDelete,
         APISetCustomizer(
@@ -74,7 +86,9 @@ def define_default_apiset_builder(config):
             path="%(model)s/{id}/",
             view=".views.delete",
             request_method="DELETE",
-            renderer="json"))
+            renderer="json"),
+        "delete %(model)s object"
+    )
 
     # children
     from sqlalchemy.orm.base import ONETOMANY, MANYTOMANY
@@ -92,7 +106,8 @@ def define_default_apiset_builder(config):
             predicate=has_children,
             request_method="GET",
             renderer="json"
-        )
+        ),
+        "listing children of %(model)s object"
     )
 
     builder.define(
@@ -104,11 +119,12 @@ def define_default_apiset_builder(config):
             predicate=has_children,
             request_method="POST",
             renderer="json"
-        )
+        ),
+        "take part in a members of %(model)s's children'"
     )
 
     builder.define(
-        i.IAddChild,
+        i.ICreateChild,
         IndirectAPISetCustomizer(
             route="%(model)s.%(child)s.unit",
             path="%(model)s/{id}/%(child)s/{child_id}/",
@@ -116,7 +132,8 @@ def define_default_apiset_builder(config):
             predicate=has_children,
             request_method="PUT",
             renderer="json"
-        )
+        ),
+        "create object as members of %(model)s's children'"
     )
 
     builder.define(
@@ -128,7 +145,8 @@ def define_default_apiset_builder(config):
             predicate=has_children,
             request_method="DELETE",
             renderer="json"
-        )
+        ),
+        "remove from members of %(model)s's children'"
     )
 
     from sqlalchemy.orm.base import MANYTOONE
@@ -142,7 +160,8 @@ def define_default_apiset_builder(config):
             predicate=lambda customizer: customizer.prop.direction == MANYTOONE,
             request_method="GET",
             renderer="json"
-        )
+        ),
+        "listing %(model)s's children'"
     )
 
 

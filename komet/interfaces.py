@@ -101,13 +101,32 @@ class IAddChild(IScene):
     name = Attribute("add_child")
 
 
+class ICreateChild(IScene):
+    name = Attribute("create_child")
+
+
 class IRemoveChild(IScene):
     name = Attribute("remove_child")
 
 
 class ISceneManager(Interface):
-    pass
+    def register(scene):
+        pass
+
+    def __getitem__(name):
+        pass
 
 
-class IName(Interface):  # xxx:
-    pass
+class IModelLinkManager(Interface):
+    def __iter__(self):
+        pass
+
+    def register(modellink):
+        pass
+
+
+class IModelLink(Interface):
+    title = Attribute("")
+    rel = Attribute("")
+    method = Attribute("")
+    href = Attribute("")
