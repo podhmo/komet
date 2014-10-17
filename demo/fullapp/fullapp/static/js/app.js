@@ -114,7 +114,7 @@ var apps = apps || {};
   });
 
   var SchemaAPIView = new APIViewFactory(function(){
-    var d = this.gateway.GET(this.gateway.baseurl+"/schema", null);
+    var d = this.gateway.GET(this.gateway.baseurl+"/schema/", null);
     return this.subview.afterAPI(d);
   });
 

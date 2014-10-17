@@ -11,7 +11,7 @@ from . import interfaces as i
 # how to use
 def includeme(config):
     from . import interfaces as i
-    builder = APISetBuilder(config, customizer=APISetCustomizer())
+    builder = APISetBuilder(config)
 
     # define api views
     builder.define(
@@ -148,7 +148,7 @@ class APISetBuilder(object):
             self.config.registry.registerAdapter(manager, (model, ), i.IModelLinkManager, event=False)
         return manager
 
-    def build(self, model, name, **kwargs):
+    def build(self, model, name, prefix=None, **kwargs):
         registered = set()
         link_manager = self.get_link_manager(model)
 
@@ -156,6 +156,8 @@ class APISetBuilder(object):
             for customizer in _customizer.iterate(model):
                 fullroute = customizer.get_route_name(model, name)
                 fullpath = customizer.get_path_name(model, name)
+                if prefix:
+                    fullpath = prefix.rstrip("/") + "/" + fullpath
 
                 if fullroute not in registered:
                     registered.add(fullroute)

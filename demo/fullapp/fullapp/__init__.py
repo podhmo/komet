@@ -22,22 +22,27 @@ def main(global_config, **settings):
 
     config.include("komet")
     config.komet_initialize(config.maybe_dotted(".models.Base"),
-                            config.maybe_dotted(".models.DBSession"))
-    config.add_komet_apiset(config.maybe_dotted(".models.MyModel"), "mymodels")
+                            config.maybe_dotted(".models.DBSession"),
+                        )
+
+    def add_apiset(model, name):
+        config.add_komet_apiset(model, name, prefix="/api")
+
+    add_apiset(config.maybe_dotted(".models.MyModel"), "mymodels")
 
     # one to many
-    config.add_komet_apiset(config.maybe_dotted(".models.User"), "users")
-    config.add_komet_apiset(config.maybe_dotted(".models.Group"), "groups")
+    add_apiset(config.maybe_dotted(".models.User"), "users")
+    add_apiset(config.maybe_dotted(".models.Group"), "groups")
 
     # many to many
-    config.add_komet_apiset(config.maybe_dotted(".models.Member"), "members")
-    config.add_komet_apiset(config.maybe_dotted(".models.Team"), "teams")
+    add_apiset(config.maybe_dotted(".models.Member"), "members")
+    add_apiset(config.maybe_dotted(".models.Team"), "teams")
 
     # complex (from colanderalchemy)
-    config.add_komet_apiset(config.maybe_dotted(".models.Account"), "accounts")
-    config.add_komet_apiset(config.maybe_dotted(".models.Person"), "people")
-    config.add_komet_apiset(config.maybe_dotted(".models.PersonGroup"), "pgroups")
-    config.add_komet_apiset(config.maybe_dotted(".models.Address"), "addresses")
+    add_apiset(config.maybe_dotted(".models.Account"), "accounts")
+    add_apiset(config.maybe_dotted(".models.Person"), "people")
+    add_apiset(config.maybe_dotted(".models.PersonGroup"), "pgroups")
+    add_apiset(config.maybe_dotted(".models.Address"), "addresses")
 
     # ui
     config.add_mako_renderer(".html")
