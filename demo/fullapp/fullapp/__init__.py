@@ -44,6 +44,8 @@ def main(global_config, **settings):
     add_apiset(config.maybe_dotted(".models.PersonGroup"), "pgroups")
     add_apiset(config.maybe_dotted(".models.Address"), "addresses")
 
+    config.add_tween("komet.tweens.allow_cross_origin_tween")
+
     # ui
     config.add_mako_renderer(".html")
     config.add_static_view("bower", '../bower_components')
