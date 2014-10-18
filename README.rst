@@ -182,3 +182,30 @@ schema information
       ]
     }
 
+
+add validatioin
+----------------------------------------
+
+models.py
+
+::
+
+    from sqlalchemy.sql import exists
+    from komet import ValidationError, custom_data_validation
+
+
+    @custom_data_validation("create", Team)
+    @custom_data_validation("edit", Team)
+    def unique_name(context, params, ob):
+        if context.session.query(exists().where(Team.name == params["name"])).scalar():
+            raise ValidationError({"name": "name is not unique"})
+
+
+then,
+
+::
+
+    $ curl -X POST -d '{"name": "foo"}' http://localhost:6543/api/teams/
+    {"id": 1, "type": "Team", "name": "foo", "created_at": null}
+    $ curl -X POST -d '{"name": "foo"}' http://localhost:6543/api/teams/
+    {"message": {"name": "name is not unique"}, "status": 400}
