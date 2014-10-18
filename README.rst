@@ -160,7 +160,7 @@ schema information
         {
           "href": "/api/teams/{id}/members/",
           "rel": "self",
-          "title": "take part in a members of Team's children",
+          "title": "create object as members of Team's children",
           "method": "POST",
           "encType": "application/json",
           "mediaType": "application/json"
@@ -168,7 +168,7 @@ schema information
         {
           "href": "/api/teams/{id}/members/{child_id}/",
           "rel": "self",
-          "title": "create object as members of Team's children",
+          "title": "take part in a members of Team's children",
           "method": "PUT",
           "encType": "application/json",
           "mediaType": "application/json"

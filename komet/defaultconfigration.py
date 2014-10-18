@@ -121,7 +121,7 @@ def define_default_apiset_builder(config):
             request_method="POST",
             renderer="json"
         ),
-        "take part in a members of %(model)s's children"
+        "create object as members of %(model)s's children"
     )
 
     builder.define(
@@ -134,7 +134,7 @@ def define_default_apiset_builder(config):
             request_method="PUT",
             renderer="json"
         ),
-        "create object as members of %(model)s's children"
+        "take part in a members of %(model)s's children"
     )
 
     builder.define(
