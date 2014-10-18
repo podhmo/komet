@@ -133,8 +133,8 @@ class APISetBuilder(object):
             self.config.registry.registerUtility(scene_manager, i.ISceneManager)
         return scene_manager
 
-    def define(self, scene, customizer, description):
-        self.definitions.append((scene, customizer, description))
+    def define(self, scene, customizer, description, no_content=False):
+        self.definitions.append((scene, customizer, description, no_content))
         self.scene_manager.register(scene)
 
     def __copy__(self):
@@ -152,7 +152,7 @@ class APISetBuilder(object):
         registered = set()
         link_manager = self.get_link_manager(model)
 
-        for (scene, _customizer, description) in self.definitions:
+        for (scene, _customizer, description, no_content) in self.definitions:
             for customizer in _customizer.iterate(model):
                 fullroute = customizer.get_route_name(model, name)
                 fullpath = customizer.get_path_name(model, name)
@@ -170,16 +170,21 @@ class APISetBuilder(object):
                 self.config.add_view(customizer.view, route_name=fullroute, **kw)
 
                 link_manager.register(
-                    ModelLink(title=description % dict(model=model.__name__), rel="self", method=kw.get("request_method", "GET"), href=fullpath))
+                    ModelLink(title=description % dict(model=model.__name__),
+                              rel="self",
+                              method=kw.get("request_method", "GET"),
+                              href=fullpath,
+                              no_content=no_content))
 
 
 @implementer(i.IModelLink)
 class ModelLink(object):
-    def __init__(self, title, rel, method, href):
+    def __init__(self, title, rel, method, href, no_content):
         self.title = title
         self.rel = rel
         self.method = method
         self.href = href
+        self.no_content = no_content
 
 
 class ModelLinkManager(object):

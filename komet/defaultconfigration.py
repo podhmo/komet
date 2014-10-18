@@ -87,7 +87,8 @@ def define_default_apiset_builder(config):
             view=".views.delete",
             request_method="DELETE",
             renderer="json"),
-        "delete %(model)s object"
+        "delete %(model)s object",
+        no_content=True
     )
 
     # children
@@ -120,7 +121,7 @@ def define_default_apiset_builder(config):
             request_method="POST",
             renderer="json"
         ),
-        "take part in a members of %(model)s's children'"
+        "take part in a members of %(model)s's children"
     )
 
     builder.define(
@@ -133,7 +134,7 @@ def define_default_apiset_builder(config):
             request_method="PUT",
             renderer="json"
         ),
-        "create object as members of %(model)s's children'"
+        "create object as members of %(model)s's children"
     )
 
     builder.define(
@@ -146,7 +147,8 @@ def define_default_apiset_builder(config):
             request_method="DELETE",
             renderer="json"
         ),
-        "remove from members of %(model)s's children'"
+        "remove from members of %(model)s's children",
+        no_content=True
     )
 
     from sqlalchemy.orm.base import MANYTOONE

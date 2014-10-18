@@ -34,13 +34,16 @@ class ModelRendererFactory(object):
         return result
 
     def jsonify_model_link(self, ob, request):
-        return {
+        result = {
             "title": ob.title,
             "method": ob.method,
             "href": ob.href,
             "rel": ob.rel,
-            "mediaType": "application/json"
         }
+        if not ob.no_content:
+            result["mediaType"] = "application/json"  # request
+            result["encType"] = "application/json"  # response
+        return result
 
     def __call__(self, Base):
         self.renderer.add_adapter(Base, self.jsonify_sqlaobject)
