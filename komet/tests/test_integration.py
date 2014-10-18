@@ -105,7 +105,7 @@ def test_it():
 
     # delete model
     response = app.delete_json("/points/{}/".format(id))
-    assert response.status_code == 200
+    assert response.status_code == 204
 
     # listing model (after delete model)
     response = app.get_json("/points/")
@@ -177,7 +177,7 @@ def test_many_to_many():
 
     # remove children
     response = app.delete_json("/teams/{id}/members/{child_id}".format(id=parent_id, child_id=child_id))
-    assert response.status_code == 200
+    assert response.status_code == 204
     # listing children (after remove children)
     response = app.get_json("/teams/{id}/members/".format(id=parent_id))
     assert response.status_code == 200

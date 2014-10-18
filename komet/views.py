@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from .executors import ValidationError
+from pyramid.httpexceptions import HTTPNoContent
 from .httpexceptions import APINotFound
 from .interfaces import (
     ICreate,
@@ -72,7 +73,7 @@ def remove_child(context, request):  # xxx:
     if child is None:
         raise APINotFound("")
     getattr(ob, context.prop.key).remove(child)
-    return {"parent": ob, "child": child}
+    return HTTPNoContent("")
 
 
 def show_child(context, request):  # xxx:
@@ -120,4 +121,4 @@ def delete(context, request):
     except ValidationError as e:
         raise context.httpexception(e)
     ob = executor.execute(ob=ob)
-    return ob  # dummy?
+    return HTTPNoContent("")
